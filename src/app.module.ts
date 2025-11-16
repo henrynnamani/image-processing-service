@@ -7,14 +7,37 @@ import jwtConfig from './config/jwt.config';
 import { environmentValidator } from './config/environment.validator';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './module/auth/guard/auth.guard';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { datasource } from './database/datasource';
+import { UsersModule } from './module/users/users.module';
+import { ImagesModule } from './module/images/images.module';
+import { AuthModule } from './module/auth/auth.module';
+import s3Config from './config/s3.config';
+import { S3Module } from './module/s3/s3.module';
 
 @Module({
   imports: [
+    UsersModule,
+    ImagesModule,
+    AuthModule,
+    S3Module,
+    TypeOrmModule.forRootAsync({
+      useFactory: async () => ({
+        ...datasource.options,
+      }),
+      dataSourceFactory: async () => {
+        if (datasource.isInitialized) {
+          return datasource;
+        }
+
+        return datasource.initialize();
+      },
+    }),
     ConfigModule.forRoot({
       cache: true,
       envFilePath: '.env',
       isGlobal: true,
-      load: [jwtConfig],
+      load: [jwtConfig, s3Config],
       validationSchema: environmentValidator,
     }),
     JwtModule.registerAsync({
