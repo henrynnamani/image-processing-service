@@ -1,5 +1,6 @@
+import { Image } from '@/module/images/model/image.entity';
 import { BaseEntity } from '@/shared/base.entity';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -8,4 +9,7 @@ export class User extends BaseEntity {
 
   @Column({ type: 'varchar' })
   password: string;
+
+  @OneToMany(() => Image, (image) => image.user)
+  images: Image[];
 }

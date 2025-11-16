@@ -1,13 +1,14 @@
 import {
   Controller,
   Get,
+  Param,
   Post,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { SkipAuth } from '../auth/decorator/skipAuth.decorator';
 import { ImagesService } from './provider/images.service';
+import { ImageTransformDto } from './dto/transform.dto';
 
 @Controller('images')
 export class ImagesController {
@@ -19,7 +20,12 @@ export class ImagesController {
   }
 
   @Post(':id/transform')
-  transformImage() {}
+  transformImage(
+    @Param('id') id: string,
+    transformImageDto: ImageTransformDto,
+  ) {
+    return this.imagesService.transformImage(id, transformImageDto);
+  }
 
   @Get(':id')
   retrieveImage() {}
