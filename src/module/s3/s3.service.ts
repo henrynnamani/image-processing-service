@@ -37,6 +37,7 @@ export class S3Service {
 
     return {
       url: `https://${bucket}.s3.${this.configService.get('s3.region')}.amazonaws.com/${key}`,
+      key,
     };
   }
 
@@ -73,11 +74,11 @@ export class S3Service {
         image = image.rotate(transformations.rotate);
       }
 
-      if (transformations?.filter?.grayscale) {
+      if (transformations?.filters?.grayscale) {
         image = image.grayscale();
       }
 
-      if (transformations?.filter?.sepia) {
+      if (transformations?.filters?.sepia) {
         image = image.tint({ r: 112, g: 66, b: 20 });
       }
 
@@ -88,8 +89,6 @@ export class S3Service {
             | sharp.AvailableFormatInfo,
         );
       }
-
-      // const newKey = `uploads/${Date.now()}-${originalImage.}`;
 
       const buffer = await image.toBuffer();
 

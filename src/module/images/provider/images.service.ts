@@ -22,13 +22,23 @@ export class ImagesService {
     this.modelAction = new ModelAction(imageRepository);
   }
 
-  async uploadImage(file) {
-    const url = await this.s3Service.uploadFile(file);
+  async uploadImage(file: Express.Multer.File, userId: string) {
+    const response = await this.s3Service.uploadFile(file);
 
-    const record = await this.modelAction.create(url);
+    const record = await this.modelAction.create({
+      user: { id: userId },
+      url: response.url,
+      key: response.key,
+    });
 
     return {
       data: record,
+      metadat: {
+        originalName: file.originalname,
+        mimeType: file.mimetype,
+        size: file.size,
+        filename: file.filename,
+      },
     };
   }
 
@@ -40,9 +50,21 @@ export class ImagesService {
         throw new NotFoundException(SYS_MSG.ENTITY_NOT_FOUND);
       }
 
-      return this.s3Service.transformImage(imageExist.url, transformFilter);
+      return this.s3Service.transformImage(imageExist.key, transformFilter);
     } catch (err) {
       throw new RequestTimeoutException(err);
     }
   }
+
+  async retrieveImage(id: string): Promise<Image | null> {
+    try {
+      const image = await this.modelAction.findOne(id);
+
+      return image;
+    } catch (err) {
+      throw new RequestTimeoutException(err);
+    }
+  }
+
+  async getAllImage() {}
 }

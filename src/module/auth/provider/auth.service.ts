@@ -41,7 +41,7 @@ export class AuthService {
 
       const token = await this.tokenService.generateToken(
         {
-          id: user.id,
+          sub: user.id,
           username: user.username,
         },
         TokenType.ACCESS,
@@ -80,7 +80,7 @@ export class AuthService {
 
       const token = await this.tokenService.generateToken(
         {
-          id: userExist.id,
+          sub: userExist.id,
           username: userExist.username,
         },
         TokenType.ACCESS,

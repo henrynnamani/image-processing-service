@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
@@ -9,27 +10,35 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImagesService } from './provider/images.service';
 import { ImageTransformDto } from './dto/transform.dto';
+import { CurrentUser } from '../auth/decorator/current-user.decorator';
 
 @Controller('images')
 export class ImagesController {
   constructor(private readonly imagesService: ImagesService) {}
   @Post('')
   @UseInterceptors(FileInterceptor('file'))
-  uploadImage(@UploadedFile() file: Express.Multer.File) {
-    return this.imagesService.uploadImage(file);
+  uploadImage(
+    @UploadedFile() file: Express.Multer.File,
+    @CurrentUser('id') loggedInUser,
+  ) {
+    return this.imagesService.uploadImage(file, loggedInUser);
   }
 
   @Post(':id/transform')
   transformImage(
     @Param('id') id: string,
-    transformImageDto: ImageTransformDto,
+    @Body() transformImageDto: ImageTransformDto,
   ) {
     return this.imagesService.transformImage(id, transformImageDto);
   }
 
   @Get(':id')
-  retrieveImage() {}
+  retrieveImage(@Param('id') id: string) {
+    return this.imagesService.retrieveImage(id);
+  }
 
   @Get('')
-  getAllImage() {}
+  getAllImage() {
+    return this.imagesService.getAllImage()
+  }
 }

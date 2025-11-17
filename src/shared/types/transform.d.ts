@@ -12,7 +12,7 @@ export interface ITransform {
     };
     rotate?: number;
     format?: string;
-    filter?: {
+    filters?: {
       grayscale?: boolean;
       sepia?: boolean;
     };

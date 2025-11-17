@@ -3,8 +3,9 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  Validate,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class ResizeDto {
   @IsNumber()
@@ -45,29 +46,33 @@ export class FilterDto {
 }
 
 export class TransformationDto {
-  @Validate(() => ResizeDto)
+  @ValidateNested()
+  @Type(() => ResizeDto)
   @IsOptional()
-  resize: ResizeDto;
+  resize?: ResizeDto;
 
-  @Validate(() => ResizeDto)
+  @ValidateNested()
+  @Type(() => CropDto)
   @IsOptional()
-  crop: CropDto;
+  crop?: CropDto;
 
   @IsNumber()
   @IsOptional()
-  rotate: number;
+  rotate?: number;
 
   @IsString()
   @IsOptional()
-  format: string;
+  format?: string;
 
-  @Validate(() => FilterDto)
+  @ValidateNested()
+  @Type(() => FilterDto)
   @IsOptional()
-  filter: FilterDto;
+  filters?: FilterDto;
 }
 
 export class ImageTransformDto {
-  @Validate(() => TransformationDto)
+  @ValidateNested()
+  @Type(() => TransformationDto)
   @IsOptional()
-  transformations: TransformationDto;
+  transformations?: TransformationDto;
 }
