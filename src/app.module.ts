@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import jwtConfig from './config/jwt.config';
@@ -14,6 +12,9 @@ import { ImagesModule } from './module/images/images.module';
 import { AuthModule } from './module/auth/auth.module';
 import s3Config from './config/s3.config';
 import { S3Module } from './module/s3/s3.module';
+import { seconds, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import redisConfig from './config/redis.config';
+import { RedisModule } from './module/redis/redis.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { S3Module } from './module/s3/s3.module';
     ImagesModule,
     AuthModule,
     S3Module,
+    RedisModule,
     TypeOrmModule.forRootAsync({
       useFactory: async () => ({
         ...datasource.options,
@@ -37,7 +39,7 @@ import { S3Module } from './module/s3/s3.module';
       cache: true,
       envFilePath: '.env',
       isGlobal: true,
-      load: [jwtConfig, s3Config],
+      load: [jwtConfig, s3Config, redisConfig],
       validationSchema: environmentValidator,
     }),
     JwtModule.registerAsync({
@@ -51,13 +53,24 @@ import { S3Module } from './module/s3/s3.module';
         },
       }),
     }),
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: seconds(60),
+          limit: 10,
+        },
+      ],
+    }),
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [
-    AppService,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })

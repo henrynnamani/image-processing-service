@@ -24,7 +24,7 @@ export class S3Service {
   async uploadFile(file: Express.Multer.File) {
     const bucket = this.configService.get('s3.bucket');
 
-    const key = `uploads/${Date.now()}-${file.originalname}`;
+    const key = `uploads/${Date.now()}-${file?.originalname}`;
 
     const upload = await this.s3.send(
       new PutObjectCommand({

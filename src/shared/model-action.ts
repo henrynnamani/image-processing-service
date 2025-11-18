@@ -6,6 +6,7 @@ import {
   Repository,
 } from 'typeorm';
 import * as SYS_MSG from '@/shared/system-message';
+import { IPagination } from './types/pagination';
 
 @Injectable()
 export class ModelAction<T extends ObjectLiteral> {
@@ -59,6 +60,15 @@ export class ModelAction<T extends ObjectLiteral> {
     Object.assign(entity, data);
 
     return this.repository.save(entity);
+  }
+
+  async list(query: IPagination) {
+    const entities = await this.repository.find({
+      skip: (query.page - 1) * query.limit,
+      take: query.limit,
+    });
+
+    return entities;
   }
 
   async remove(id: string): Promise<T> {

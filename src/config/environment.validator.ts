@@ -14,4 +14,6 @@ export const environmentValidator = Joi.object({
   AWS_ACCESS_KEY_ID: Joi.string().required(),
   AWS_SECRET_ACCESS_KEY: Joi.string().required(),
   AWS_S3_BUCKET: Joi.string().required(),
+  UPSTASH_REDIS_REST_URL: Joi.string().required(),
+  UPSTASH_REDIS_REST_TOKEN: Joi.string().required(),
 });
